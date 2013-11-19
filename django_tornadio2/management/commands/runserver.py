@@ -98,9 +98,9 @@ class Command(BaseCommand):
             router.urls + tornado_routes + [
                 # Uncomment next line to handle static files through Tornado rather than Django or externally.
                 #(r'/static/(.*)', StaticFileHandler, {'path': settings.STATICFILES_DIRS[0]}),
-                (r'/admin$', RedirectHandler, {'url': '/admin/', 'permanent': True}),
+                #(r'/admin$', RedirectHandler, {'url': '/admin/', 'permanent': True}),
                 # You probably want to comment out the next line if you have a login form.
-                (r'/accounts/login/.*', RedirectHandler, {'url': '/admin/', 'permanent': False}),
+                #(r'/accounts/login/.*', RedirectHandler, {'url': '/admin/', 'permanent': False}),
                 (r'.*', FallbackHandler, {'fallback': app_handler}),
             ],
             #flash_policy_port = 843,
