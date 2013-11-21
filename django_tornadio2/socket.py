@@ -170,7 +170,13 @@ class BackboneConnection(SocketConnection):
                 conn.emit(event, message)
 
     def on_open(self, conn_info):
-        session_key = conn_info.get_cookie('sessionid').value
+        session_cookie = conn_info.get_cookie('sessionid')
+
+        if session_cookie is None:
+            return False
+
+        session_key = session_cookie.value
+
         request = SessionRequest(session_key)
         self.session_request = request  # Store the request for future access to the session.
         user = get_user(request)
