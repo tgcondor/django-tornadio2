@@ -72,7 +72,7 @@ class Command(BaseCommand):
         for Cls in load_classes(getattr(settings,'SOCKETIO_CLASSES', [])):
             mixin(BaseSocket, Cls)
 
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
         wsgi_app = get_wsgi_application()
         app_handler = WSGIContainer(StaticFilesHandler(wsgi_app))
         router = TornadioRouter(BaseSocket, {
