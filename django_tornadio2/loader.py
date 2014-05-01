@@ -19,13 +19,16 @@ from django.utils.datastructures import SortedDict
 from django.utils.functional import empty, memoize
 from django.utils.importlib import import_module
 
+
 def mixin(Cls, MixinClass):
     Cls.__bases__ += (MixinClass,)
     Cls._events.update(MixinClass._events)
 
+
 def load_classes(path_list, BaseClass=None):
     for path in path_list:
         yield get_class(path, BaseClass)
+
 
 def _get_class(import_path, BaseClass):
     """

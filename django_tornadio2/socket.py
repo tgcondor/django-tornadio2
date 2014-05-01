@@ -15,16 +15,13 @@
 # under the License.
 
 from tornadio2 import SocketConnection
-from tornadio2 import event
-from tornadio2.conn import EventMagicMeta
-
 from django.conf import settings
 from django.contrib.auth import get_user
 
 import sys
 import logging
 
-# TODO: Use a dummy request from Django instead of declaring a plain one. TAA - 2012-03-09.
+
 class SessionRequest(object):
     """
     An object that stores a reference to a Django session.
@@ -39,6 +36,7 @@ class SessionRequest(object):
         from django.utils.importlib import import_module
         engine = import_module(settings.SESSION_ENGINE)
         self.session = engine.SessionStore(session_key)
+
 
 class SocketEventHandler(SocketConnection):
     def get_user_instance(self, Model, **kwargs):
@@ -67,11 +65,12 @@ class SocketEventHandler(SocketConnection):
         return instance
          
     def handle_read(self, read_model, read_collection, **kwargs):
-        '''A read event can be triggered on a collection or individual models.'''
+        """A read event can be triggered on a collection or individual models."""
         if 'args' in kwargs and isinstance(kwargs['args'], list):
             return read_collection(**kwargs)
         else:
             return read_model(**kwargs)
+
 
 class BackboneConnection(SocketConnection):
     """
@@ -120,8 +119,6 @@ class BackboneConnection(SocketConnection):
         # Ensure that the user is still authenticated for each event.
         try:
             self.user = get_user(self.session_request)
-            if self.user.is_authenticated():
-                print 'User is authenticated. Proceeding with the event handling.'
         except:
             print "Unexpected error:", sys.exc_info()
             self.close()
@@ -188,23 +185,9 @@ class BackboneConnection(SocketConnection):
     def on_close(self):
         settings.SOCKETIO_GLOBALS['connections'][self.user.id].remove(self)
 
-    @event
-    def command(self, *args, **kwargs):
-        """
-        Shell-like API. Restricted access to superusers.
-        """
-        if not self.user.is_superuser:
-            return 'Permission denied.', None
-        command = kwargs['command']
-        name = kwargs['event']
-        del kwargs['command']
-        del kwargs['event']
-        # TODO: Incomplete. TAA - 2012-03-16.
-        if name == 'emit':
-            self.emit()
-        super(BackboneConnection, self).on_event(name, *args, **kwargs)
 
 class BaseSocket(BackboneConnection):
-    '''A base socket class to be mixed in with other sockets.'''
+    """A base socket class to be mixed in with other sockets."""
+
     def on_message(self, message):
         print 'Received message: %s' % str(message)
